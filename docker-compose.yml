@@ -1,0 +1,20 @@
+services:
+  datahub:
+    image: datahub
+    env_file:
+      - .env
+    ports:
+      - ${DATAHUB_PORT:-8000}:8000
+    volumes:
+      - ./data:/app/data/
+      - ./src:/app/src/
+
+  postgis:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdat
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
