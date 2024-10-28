@@ -32,6 +32,10 @@ If you change the `.env` file run the following command to apply the changes:
 
 Now either import an existing data dump, or create a new instance.
 
+### Ollama Setup
+
+To download the required model run: `$ docker compose exec ollama ollama pull dolphin-llama3:latest`
+
 ### Import Data
 
 We provide ready-to-use database export for Ghana that you can use to directly see and use the system without the need to download and process the raw data on your local machine.
