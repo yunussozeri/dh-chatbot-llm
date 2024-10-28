@@ -1,3 +1,6 @@
+# views.py
 from django.shortcuts import render
+import requests
 
-# Create your views here.
+def home_view(request):
+    return 
