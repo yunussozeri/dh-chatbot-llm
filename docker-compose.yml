@@ -18,3 +18,23 @@ services:
       PGDATA: /var/lib/postgresql/data/pgdat
     volumes:
       - ./pgdata:/var/lib/postgresql/data
+
+
+  ollama:
+    image: ollama/ollama
+    ports:
+     - 11434:11434/tcp
+    volumes:
+      - ollama:/root/.ollama
+    restart: unless-stopped
+    # runtime: nvidia
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all # alternatively, use `all` for all GPUs
+    #           capabilities: [gpu]
+
+volumes: 
+  ollama:
