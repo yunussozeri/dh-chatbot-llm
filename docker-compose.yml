@@ -19,11 +19,10 @@ services:
     volumes:
       - ./pgdata:/var/lib/postgresql/data
 
-
   ollama:
     image: ollama/ollama
     ports:
-     - 11434:11434/tcp
+      - 11434:11434/tcp
     volumes:
       - ollama:/root/.ollama
     restart: unless-stopped
@@ -35,6 +34,18 @@ services:
     #         - driver: nvidia
     #           count: all # alternatively, use `all` for all GPUs
     #           capabilities: [gpu]
+  webui:
+    image: ghcr.io/open-webui/open-webui:main
+    ports:
+      - 7080:8080/tcp
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+    volumes:
+      - webui:/app/backend/data
+    depends_on:
+      - ollama
+    restart: unless-stopped
 
-volumes: 
+volumes:
   ollama:
+  webui:
