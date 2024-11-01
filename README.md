@@ -7,13 +7,7 @@ The Data Hub is a geographic information system (GIS) featuring a data fusion en
 
 ## Installation
 
-We do not yet provide a ready to use Docker image of the Data Hub, so for now you need to first build the base image yourself. For this first step follow these instructions:
-
-- Clone the [Data Hub repository](https://github.com/datasnack/datahub) to your computer: `$ git clone https://github.com/yunussozeri/dh-chatbot-llm.git`
-- Inside this folder build the Docker container with `$ docker build -t datahub:latest .`
-
-
-No we can clone the Ghana Hub instance (this repository) into a new folder:
+We can clone the Ghana Hub instance (this repository) into a new folder:
 
 - Clone the repository `$ git clone https://github.com/datasnack/datahub.git`
 - Copy the `.env.example` to `.env`: `$ cp .env.example .env`
