@@ -1,3 +1,7 @@
+# REST Client Files
+.rest
+.http
+
 # General
 .DS_Store
 .AppleDouble
