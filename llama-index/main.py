@@ -22,7 +22,10 @@ json_data = get_json_data()
 
 
 #llm = Ollama(model="gemma2:2b", request_timeout=30.0)
-llm = Ollama(base_url='http://localhost:11434', model="dolphin-llama3:latest", request_timeout=60.0)
+llm = Ollama(base_url='http://localhost:11434', model="dolphin-llama3:latest", request_timeout=220.0)
+#llm = Ollama(base_url='http://home-server.home.arpa:11434', model="dolphin-llama3:latest", request_timeout=30.0)
+#llm = Ollama(base_url='http://home-server.home.arpa:11434', model="phi3:mini", request_timeout=30.0)
+#llm = Ollama(base_url='http://localhost:11434', model="phi3:mini", request_timeout=120.0)
 
 
 
