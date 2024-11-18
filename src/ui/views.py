@@ -1,15 +1,11 @@
-# views.py
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework import status
 from django.shortcuts import render
-import requests
+import requests as r
+import json as jj
+from django.http import HttpResponse
 
-def home_view(request):
-    data = {"message": "Hello, World!"}
-    return Response(data, status=status.HTTP_200_OK)
-
-@api_view(['GET'])
-def example_view(request):
-    data = {"message": "Hello, World!"}
-    return Response(data, status=status.HTTP_200_OK)
+def hello(request):
+    
+    name = request.GET.get('name')
+    message = f'Hi {name} ! '
+    
+    return HttpResponse(stream)
