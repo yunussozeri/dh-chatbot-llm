@@ -6,6 +6,6 @@ from django.http import HttpResponse
 def hello(request):
     
     name = request.GET.get('name')
-    message = f'Hi {name} ! '
+    message = f'Hello FROM DJANGOOO, {name} ! '
     
-    return HttpResponse(stream)
+    return HttpResponse(message)
