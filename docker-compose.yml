@@ -34,18 +34,18 @@ services:
     #         - driver: nvidia
     #           count: all # alternatively, use `all` for all GPUs
     #           capabilities: [gpu]
-  webui:
-    image: ghcr.io/open-webui/open-webui:main
-    ports:
-      - 7080:8080/tcp
-    environment:
-      - OLLAMA_BASE_URL=http://ollama:11434
-    volumes:
-      - webui:/app/backend/data
-    depends_on:
-      - ollama
-    restart: unless-stopped
+  # webui:
+#  image: ghcr.io/open-webui/open-webui:main
+#    ports:
+#      - 7080:8080/tcp
+#    environment:
+#      - OLLAMA_BASE_URL=http://ollama:11434
+#    volumes:
+#      - webui:/app/backend/data
+#    depends_on:
+#      - ollama
+#   restart: unless-stopped
 
 volumes:
   ollama:
-  webui:
+  #webui:

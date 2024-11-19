@@ -1,4 +1,3 @@
-from django.shortcuts import render
 import requests as r
 import json as jj
 from django.http import HttpResponse
@@ -6,6 +5,5 @@ from django.http import HttpResponse
 def hello(request):
     
     name = request.GET.get('name')
-    message = f'Hello FROM DJANGOOO, {name} ! '
-    
+    message = f'Hosgeldin {name} ! '
     return HttpResponse(message)
