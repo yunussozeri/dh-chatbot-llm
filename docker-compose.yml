@@ -1,6 +1,6 @@
 services:
   datahub:
-    image: datahub
+    image: ghcr.io/datasnack/datahub:latest
     env_file:
       - .env
     ports:
@@ -18,7 +18,17 @@ services:
       PGDATA: /var/lib/postgresql/data/pgdat
     volumes:
       - ./pgdata:/var/lib/postgresql/data
-
+      
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "admin@admin.com"
+      PGADMIN_DEFAULT_PASSWORD: "admin"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
   ollama:
     image: ollama/ollama
     ports:
@@ -48,4 +58,4 @@ services:
 
 volumes:
   ollama:
-  #webui:
+  pgadmin-data:
