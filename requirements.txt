@@ -3,3 +3,4 @@ pandas
 matplotlib
 sqlite-utils
 ipython
+requests

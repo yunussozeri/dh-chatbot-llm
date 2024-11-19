@@ -23,7 +23,7 @@ json_data = get_json_data()
 
 #llm = Ollama(model="gemma2:2b", request_timeout=30.0)
 #llm = Ollama(base_url='http://localhost:11434', model="dolphin-llama3:latest", request_timeout=220.0)
-llm = Ollama(base_url='http://localhost:8001', model="dolphin-llama3:latest", request_timeout=220.0)
+llm = Ollama(base_url='http://localhost:8000', model="dolphin-llama3:latest", request_timeout=220.0)
 #llm = Ollama(base_url='http://localhost:8001/api/v1/namespaces/wem133-default/services/ollama:http/proxy/', model="dolphin-llama3:latest", request_timeout=220.0)
 #llm = Ollama(base_url='http://home-server.home.arpa:11434', model="dolphin-llama3:latest", request_timeout=30.0)
 #llm = Ollama(base_url='http://home-server.home.arpa:11434', model="phi3:mini", request_timeout=30.0)
@@ -42,22 +42,18 @@ nl_query_engine = JSONalyzeQueryEngine(
 #    synthesize_response=False,
 #)
 
-nl_response = nl_query_engine.query(
-    "What years are covered in the data?",
-)
+#nl_response = nl_query_engine.query("What years are covered in the data? ")
 #raw_response = raw_query_engine.query(
 #    "What years are covered?",
 #)
 
 
-display(
-    Markdown(f"<h1>Natural language Response</h1><br><b>{nl_response}</b>")
-)
+#display(Markdown(f"<h1>Natural language Response</h1><br><b>{nl_response}</b>"))
 #display(Markdown(f"<h1>Raw Response</h1><br><b>{raw_response}</b>"))
 
 
-#resp = gemma_2b.complete("Who is Paul Graham?")
-#print(resp)
+resp = llm.complete("Who is Paul Graham?")
+print(resp)
 
 
 
