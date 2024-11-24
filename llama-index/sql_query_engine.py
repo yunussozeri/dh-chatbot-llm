@@ -1,30 +1,64 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, MetaData, inspect
 
-from llama_index.core import SQLDatabase
-from llama_index.llms.ollama import Ollama
-
+from llama_index.core import SQLDatabase, Settings
 from llama_index.core.query_engine import NLSQLTableQueryEngine
+from llama_index.llms.ollama import Ollama
+from llama_index.embeddings.ollama import OllamaEmbedding
+
+from rich.console import Console
 
 
+#init rich console
+console = Console()
 
 
-
-
+#create database engine
 database_url = 'postgresql://didex:didex@localhost:5432/didex'
 engine = create_engine(database_url)
 
+# Get the inspector
+inspector = inspect(engine)
 
-#llm = Ollama(base_url='http://home-server.home.arpa:11434', model="dolphin-llama3:latest", request_timeout=30.0)
+# Get the table names
+table_names = inspector.get_table_names()
+print(table_names)
+
+
+#init llm
 llm = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="dolphin-llama3:latest", request_timeout=30.0)
-#service_context = ServiceContext.from_defaults(llm=llm)
+#llm = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="gemma2:9b", request_timeout=30.0)
+#llm = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="mistral:latest", request_timeout=30.0)
+#llm = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="sqlcoder:7b", request_timeout=60.0)
+#llm = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="sqlcoder:15b", request_timeout=60.0)
+#llm = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="gemma2:9b", request_timeout=30.0)
 
+
+#init embedding
+ollama_embedding = OllamaEmbedding(
+    model_name="nomic-embed-text",
+    base_url="http://benedikt-home-server.duckdns.org:11434",
+    #ollama_additional_kwargs={"mirostat": 0},
+)
+
+#service_context = Settings.from_defaults(llm=llm, embed_model="local:BAAI/bge-base-en-v1.5")
+#hf_embedding = HuggingFaceEmbedding(
+#    model_name="BAAI/bge-small-en-v1.5"
+#)
+
+
+#create db object
 sql_database = SQLDatabase(
     engine, include_tables=["datalayers_datalayer"]
 )
 
+#init query engine
 query_engine = NLSQLTableQueryEngine(
-    sql_database=sql_database, tables=["city_stats"], llm=llm
+    sql_database=sql_database, tables=table_names, verbose=True, embed_model=ollama_embedding, llm=llm
 )
 
-query_str = "Wich district is the largest in Ghana?"
+#execute query
+query_str = "What is the name of the shape with the smallest area and how big is it?"
+console.print(f'[bold]{query_str}[/bold]')
+
 response = query_engine.query(query_str)
+console.print(f'[bold]{response}[/bold]')
