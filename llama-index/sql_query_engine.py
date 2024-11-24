@@ -14,7 +14,8 @@ database_url = 'postgresql://didex:didex@localhost:5432/didex'
 engine = create_engine(database_url)
 
 
-llm = Ollama(base_url='http://home-server.home.arpa:11434', model="dolphin-llama3:latest", request_timeout=30.0)
+#llm = Ollama(base_url='http://home-server.home.arpa:11434', model="dolphin-llama3:latest", request_timeout=30.0)
+llm = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="dolphin-llama3:latest", request_timeout=30.0)
 #service_context = ServiceContext.from_defaults(llm=llm)
 
 sql_database = SQLDatabase(
