@@ -25,7 +25,8 @@ print(table_names)
 
 
 #init llm
-llm = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="dolphin-llama3:latest", request_timeout=30.0)
+llm = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="phi3:3.8b-mini-4k-instruct-q8_0", request_timeout=30.0)
+#llm = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="dolphin-llama3:latest", request_timeout=30.0)
 #llm = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="gemma2:9b", request_timeout=30.0)
 #llm = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="mistral:latest", request_timeout=30.0)
 #llm = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="sqlcoder:7b", request_timeout=60.0)
