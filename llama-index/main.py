@@ -43,22 +43,18 @@ nl_query_engine = JSONalyzeQueryEngine(
 #    synthesize_response=False,
 #)
 
-nl_response = nl_query_engine.query(
-    "What years are covered in the data?",
-)
+#nl_response = nl_query_engine.query("What years are covered in the data? ")
 #raw_response = raw_query_engine.query(
 #    "What years are covered?",
 #)
 
 
-display(
-    Markdown(f"<h1>Natural language Response</h1><br><b>{nl_response}</b>")
-)
+#display(Markdown(f"<h1>Natural language Response</h1><br><b>{nl_response}</b>"))
 #display(Markdown(f"<h1>Raw Response</h1><br><b>{raw_response}</b>"))
 
 
-#resp = gemma_2b.complete("Who is Paul Graham?")
-#print(resp)
+resp = llm.complete("Who is Paul Graham?")
+print(resp)
 
 
 

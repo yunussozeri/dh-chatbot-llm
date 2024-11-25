@@ -30,3 +30,4 @@ def get_json_data():
     #print(koeppen_ds_df['year'])
 
     return json_data['data']
+
