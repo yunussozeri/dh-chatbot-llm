@@ -49,7 +49,7 @@ ollama_embedding = OllamaEmbedding(
 
 #create db object
 sql_database = SQLDatabase(
-    engine, include_tables=["datalayers_datalayer"]
+    engine, include_tables=table_names
 )
 
 #init query engine
