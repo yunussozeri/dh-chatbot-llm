@@ -1,6 +1,11 @@
 llama-index-llms-ollama
+#llama-index-embeddings-huggingface
+llama-index-embeddings-ollama
+llama-index
 pandas
 matplotlib
 sqlite-utils
 ipython
 requests
+psycopg2-binary
+rich
