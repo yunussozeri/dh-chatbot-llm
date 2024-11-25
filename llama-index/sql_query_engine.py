@@ -1,17 +1,17 @@
-from sqlalchemy import create_engine, MetaData, inspect
+from sqlalchemy import create_engine , MetaData, inspect, Engine, Inspector
 
-from llama_index.core import SQLDatabase, Settings
+from llama_index.core import SQLDatabase, Settings, Response
 from llama_index.core.query_engine import NLSQLTableQueryEngine
 from llama_index.llms.ollama import Ollama
 from llama_index.embeddings.ollama import OllamaEmbedding
-
+from typing import Optional
 from rich.console import Console
 
 
 #init rich console
 console = Console()
 
-
+'''
 #create database engine
 database_url = 'postgresql://didex:didex@localhost:5432/didex'
 engine = create_engine(database_url)
@@ -35,7 +35,7 @@ llm = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="do
 
 #init embedding
 ollama_embedding = OllamaEmbedding(
-    model_name="nomic-embed-text",
+    model_name="mx-bai-embed-large",
     base_url="http://benedikt-home-server.duckdns.org:11434",
     #ollama_additional_kwargs={"mirostat": 0},
 )
@@ -48,7 +48,7 @@ ollama_embedding = OllamaEmbedding(
 
 #create db object
 sql_database = SQLDatabase(
-    engine, include_tables=["datalayers_datalayer"]
+    engine, include_tables=table_names
 )
 
 #init query engine
@@ -62,3 +62,53 @@ console.print(f'[bold]{query_str}[/bold]')
 
 response = query_engine.query(query_str)
 console.print(f'[bold]{response}[/bold]')
+
+'''
+
+class LLMQueryEngine:
+    _instance: Optional["LLMQueryEngine"] = None  # Singleton instance holder
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    def __init__(self, DB_URL: str = 'postgresql://didex:didex@localhost:5432/didex',
+                LLM_BASE_URL: str = 'http://benedikt-home-server.duckdns.org:11434',
+                MODEL="dolphin-llama3:latest",
+                EMBEDDING_MODEL="nomic-embed-text"):
+        if not hasattr(self, "initialized"):  # Prevent reinitialization
+            self.initialized = True
+            self.database_url = DB_URL
+            self.engine = create_engine(self.database_url)
+            self.inspector = inspect(self.engine)
+            self.table_names = self.inspector.get_table_names()
+
+            self.LLM = Ollama(base_url=LLM_BASE_URL,
+                              model=MODEL,
+                              request_timeout=30.0)
+            self.embedding = OllamaEmbedding(model_name=EMBEDDING_MODEL,
+                                             base_url=LLM_BASE_URL)
+            self.sql_database = SQLDatabase(self.engine,
+                                            include_tables=self.table_names)
+
+            self.query_engine = NLSQLTableQueryEngine(sql_database=self.sql_database,
+                                                      tables=self.table_names,
+                                                      verbose=True,
+                                                      embed_model=self.embedding,
+                                                      llm=self.LLM)
+
+    def submit_query(self, query_string: str) -> Response:
+        response: Response = self.query_engine.query(query_string)
+        return response
+
+
+llm_engine = LLMQueryEngine()
+
+response = llm_engine.submit_query("What is the smallest shape in the data and how large is it?")
+
+print(response)
+        
+        
+        
+        
