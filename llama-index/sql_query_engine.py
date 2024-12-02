@@ -101,13 +101,15 @@ class LLMQueryEngine:
     def submit_query(self, query_string: str) -> Response:
         response: Response = self.query_engine.query(query_string)
         return response
+    
+    def test_import(self, test_input):
+        
+        return test_input+" HOORAY"
 
 
 llm_engine = LLMQueryEngine()
 
-response = llm_engine.submit_query("What is the smallest shape in the data and how large is it?")
-
-print(response)
+print(llm_engine.test_import("asjidnasdas"))
         
         
         

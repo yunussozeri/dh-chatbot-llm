@@ -1,9 +1,6 @@
 import requests as r
 from django.http import HttpResponse, JsonResponse
-#from .llm_query_engine import LLMQueryEngine
 from django.shortcuts import render
-
-#engine = LLMQueryEngine()
 
 def hello(request):
     
@@ -20,12 +17,9 @@ def hello(request):
 
 def llm_engine(request):
     
-    #return HttpResponse(content="hi" )
-    '''query = request.GET.get('q', '')
-    if not query:
-        return JsonResponse({'error': 'Query parameter is missing'}, status=400)
+    from .llm_query_engine import LLMQueryEngine
+    engine = LLMQueryEngine()
     
-    #response = engine.submit_query(query)
+    response = engine.test_import("HELLOOOO")
     
-    return JsonResponse(query)'''
-    return JsonResponse({'response': 'hi'})
+    return JsonResponse({'response': response})

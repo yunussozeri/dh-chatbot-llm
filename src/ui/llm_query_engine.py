@@ -1,21 +1,18 @@
-
 from sqlalchemy import create_engine , inspect
-
+from llama_index.llms.ollama import Ollama
 from llama_index.core import SQLDatabase, Response
 from llama_index.core.query_engine import NLSQLTableQueryEngine
-from llama_index.llms.ollama import Ollama
 from llama_index.embeddings.ollama import OllamaEmbedding
-from typing import Optional
 import networkx as nx
 
 
 class LLMQueryEngine:
-    _instance: Optional["LLMQueryEngine"] = None  # Singleton instance holder
+   #_instance: Optional["LLMQueryEngine"] = None  # Singleton instance holder
 
-    def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-        return cls._instance
+    #def __new__(cls, *args, **kwargs):
+     #   if cls._instance is None:
+      #      cls._instance = super().__new__(cls)
+       # return cls._instance
 
     def __init__(self, DB_URL: str = 'postgresql://didex:didex@localhost:5432/didex',
                 LLM_BASE_URL: str = 'http://benedikt-home-server.duckdns.org:11434',
@@ -52,4 +49,13 @@ class LLMQueryEngine:
         self.graph.add_node(query, type='query')
         self.graph.add_node(answer, type='response')
         self.graph.add_edge(query, answer)
+        
+    def test_import(self, test_input):
+        
+        return test_input+" HOORAY"
     
+    
+    
+llm = LLMQueryEngine()
+
+llm.test_import("asdhjasbhjd")
