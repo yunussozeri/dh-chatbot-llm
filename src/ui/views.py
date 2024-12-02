@@ -16,7 +16,7 @@ def hello(request):
 
 
 def llm_engine(request):
-    
+    #TODO : CONTAINERIZE QUERY ENGINE 
     from .llm_query_engine import LLMQueryEngine
     engine = LLMQueryEngine()
     
