@@ -50,12 +50,6 @@ class LLMQueryEngine:
         self.graph.add_node(answer, type='response')
         self.graph.add_edge(query, answer)
         
-    def test_import(self, test_input):
-        
-        return test_input+" HOORAY"
-    
     
     
 llm = LLMQueryEngine()
-
-llm.test_import("asdhjasbhjd")
