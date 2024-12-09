@@ -9,13 +9,32 @@ from llama_index.core.objects import (
 from llama_index.core import SQLDatabase, VectorStoreIndex
 from llama_index.embeddings.ollama import OllamaEmbedding
 
-
+from llama_index.core.retrievers import SQLRetriever
 
 from llama_index.core.retrievers import SQLRetriever
+from typing import List
+from llama_index.core.query_pipeline import FnComponent
+
+from llama_index.core.objects import (
+    SQLTableSchema
+)
+
+from llama_index.core.prompts.default_prompts import DEFAULT_TEXT_TO_SQL_PROMPT
+from llama_index.core import PromptTemplate
+from llama_index.core.query_pipeline import FnComponent
+from llama_index.core.llms import ChatResponse
+
+from IPython.display import display, HTML
+
+from pyvis.network import Network
 
 
 llm_synth = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="dolphin-llama3:latest", request_timeout=30.0)
+
 llm_sql = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="dolphin-llama3:latest", request_timeout=30.0)
+#llm_sql = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="mistral:latest", request_timeout=60.0)
+
+
 llm_summary = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="dolphin-llama3:latest", request_timeout=30.0)
 
 #init embedding
@@ -34,18 +53,18 @@ engine = create_engine(database_url)
 inspector = inspect(engine)
 
 # Get the table names
-table_names_inspector = inspector.get_table_names()
-print(table_names_inspector)
+table_names = inspector.get_table_names()
+print(table_names)
 
-table_names_inspector.remove('app_user_groups')
-table_names_inspector.remove('django_content_type')
-table_names_inspector.remove('django_migrations')
-table_names_inspector.remove('django_session')
-table_names_inspector.remove('auth_group')
-table_names_inspector.remove('auth_group_permissions')
+table_names.remove('app_user_groups')
+table_names.remove('django_content_type')
+table_names.remove('django_migrations')
+table_names.remove('django_session')
+table_names.remove('auth_group')
+table_names.remove('auth_group_permissions')
 
 print('after cleanup:')
-print(table_names_inspector)
+print(table_names)
 
 #create databse
 sql_database = SQLDatabase(engine)
@@ -53,63 +72,110 @@ sql_database = SQLDatabase(engine)
 #create sql retriever
 sql_retriever = SQLRetriever(sql_database)
 
-# from llama_index.core.program import LLMTextCompletionProgram
-# from llama_index.core.bridge.pydantic import BaseModel, Field
-
-# tableinfo_dir = "DataHub_TableInfo"
-
-# class TableInfo(BaseModel):
-#     """Information regarding a structured table."""
-
-#     table_name: str = Field(
-#         ..., description="table name (must be underscores and NO spaces)"
-#     )
-#     table_summary: str = Field(
-#         ..., description="short, concise summary/caption of the table"
-#     )
-
-# class TableInfo(BaseModel):
-#     """Information regarding a structured table."""
-
-#     table_name: str = Field(
-#         ..., description="table name (must be underscores and NO spaces)"
-#     )
-#     table_summary: str = Field(
-#         ..., description="short, concise summary/caption of the table"
-#     )
-
-
-# prompt_str = """\
-# Give me a summary of the table with the following JSON format.
-
-# - The table name must be unique to the table and describe it while being concise. 
-# - Do NOT output a generic table name (e.g. table, my_table).
-
-# Do NOT make the table name one of the following: {exclude_table_name_list}
-
-# Table:
-# {table_str}
-
-# Summary: """
-
-# program = LLMTextCompletionProgram.from_defaults(
-#     output_cls=TableInfo,
-#     llm=llm_summary,
-#     prompt_template_str=prompt_str,
-# )
-
-
-
-
-
-from llama_index.core.retrievers import SQLRetriever
-from typing import List
-from llama_index.core.query_pipeline import FnComponent
-
-from llama_index.core.objects import (
-    SQLTableSchema
-)
-
+table_infos = {
+    'datalayers_datalayer':'',
+    'secondary_unit_lookup':'',
+    'state_lookup':'',
+    'street_type_lookup':'',
+    'spatial_ref_sys':'',
+    'geocode_settings':'',
+    'geocode_settings_default':'',
+    'direction_lookup':'',
+    'place_lookup':'',
+    'county_lookup':'',
+    'countysub_lookup':'',
+    'zip_lookup_all':'',
+    'zip_lookup_base':'',
+    'zip_lookup':'',
+    'county':'',
+    'state':'',
+    'place':'',
+    'zip_state':'',
+    'zip_state_loc':'',
+    'cousub':'',
+    'edges':'',
+    'addrfeat':'',
+    'featnames':'',
+    'addr':'',
+    'zcta5':'',
+    'tabblock20':'',
+    'faces':'',
+    'loader_platform':'',
+    'loader_variables':'',
+    'loader_lookuptables':'',
+    'tract':'',
+    'tabblock':'',
+    'bg':'',
+    'pagc_gaz':'',
+    'pagc_lex':'',
+    'pagc_rules':'',
+    'topology':'',
+    'layer':'',
+    'auth_permission':'',
+    'chirps_prcp':'This table provides precipitation data for Ghana',
+    'chirps_tprecit':'',
+    'chirts_maxt':'',
+    'chirts_tmax':'',
+    'copernicus_built':'',
+    'copernicus_crop':'',
+    'copernicus_forest':'',
+    'copernicus_herbveg':'',
+    'copernicus_herbwet':'',
+    'copernicus_moss':'',
+    'copernicus_schrub':'',
+    'copernicus_shrub':'',
+    'copernicus_sparse':'',
+    'copernicus_water':'',
+    'custom_covreflab':'',
+    'data_custom_covreflab':'',
+    'data_healthsitesio_facilities':'',
+    'data_osm_river':'',
+    'app_user':'',
+    'app_user_user_permissions':'',
+    'datalayers_datalayerlogentry':'',
+    'datalayers_datalayersource':'',
+    'datalayers_datalayer_related_to':'',
+    'dhs_drinkwater':'',
+    'era5_t2m':'',
+    'healthsitesio_facilities':'',
+    'koeppen_a':'',
+    'koeppen_af':'',
+    'koeppen_am':'',
+    'koeppen_aw':'',
+    'koeppen_b':'',
+    'koeppen_bs':'',
+    'koeppen_bw':'',
+    'koeppen_c':'',
+    'koeppen_cf':'',
+    'datalayers_category':'',
+    'django_admin_log':'',
+    'koeppen_cs':'',
+    'koeppen_cw':'',
+    'koeppen_d':'',
+    'koeppen_df':'',
+    'koeppen_ds':'',
+    'koeppen_dw':'',
+    'koeppen_e':'',
+    'koeppen_ef':'',
+    'koeppen_et':'',
+    'malariaatlas_traveltimehc':'',
+    'meteo_maxt':'',
+    'meteo_mint':'',
+    'meteo_prcp':'This table provides precipitation data for Ghana',
+    'meteo_tavg':'',
+    'meteo_tmax':'',
+    'meteo_tmin':'',
+    'meteo_tprecit':'',
+    'meteostat_daily':'',
+    'meteostat_hourly':'',
+    'meteostat_stations':'',
+    'shapes_shape':'',
+    'worldpop_popc':'',
+    'worldpop_popd':'',
+    'shapes_type':'',
+    'taggit_taggeditem':'',
+    'taggit_tag':''
+}
 
 
 
@@ -132,9 +198,10 @@ table_parser_component = FnComponent(fn=get_table_context_str)
 
 
 table_node_mapping = SQLTableNodeMapping(sql_database)
+
 table_schema_objs = [
-    (SQLTableSchema(table_name=table_name))
-    for table_name in table_names_inspector
+    SQLTableSchema(table_name=table_name, context_str=table_infos.get(table_name))
+    for table_name in table_names
 ]  # add a SQLTableSchema for each table
 
 obj_index = ObjectIndex.from_objects(
@@ -149,11 +216,6 @@ obj_retriever = obj_index.as_retriever(similarity_top_k=3)
 table_context_string = get_table_context_str(table_schema_objs)
 
 print(table_context_string)
-
-from llama_index.core.prompts.default_prompts import DEFAULT_TEXT_TO_SQL_PROMPT
-from llama_index.core import PromptTemplate
-from llama_index.core.query_pipeline import FnComponent
-from llama_index.core.llms import ChatResponse
 
 
 def parse_response_to_sql(response: ChatResponse) -> str:
@@ -231,7 +293,7 @@ qp.add_link("input", "response_synthesis_prompt", dest_key="query_str")
 qp.add_link("response_synthesis_prompt", "response_synthesis_llm")
 
 
-from pyvis.network import Network
+
 
 net = Network(notebook=True, cdn_resources="in_line", directed=True)
 net.from_nx(qp.dag)
@@ -240,8 +302,6 @@ net.from_nx(qp.dag)
 # Save the network as "text2sql_dag.html"
 net.write_html("text2sql_dag.html")
 
-
-from IPython.display import display, HTML
 
 # Read the contents of the HTML file
 with open("text2sql_dag.html", "r") as file:
