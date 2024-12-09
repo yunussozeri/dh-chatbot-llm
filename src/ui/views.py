@@ -16,7 +16,7 @@ def hello(request):
 
 
 def llm_engine(request):
-    
+    #TODO: update this function to make a POST call to localhost:8001/query
     q = request.GET.get('q')
     
     
