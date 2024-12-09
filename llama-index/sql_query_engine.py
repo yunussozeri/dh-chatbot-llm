@@ -1,3 +1,4 @@
+
 from sqlalchemy import create_engine, MetaData, inspect
 
 from llama_index.core import SQLDatabase, Settings
@@ -48,7 +49,9 @@ ollama_embedding = OllamaEmbedding(
 
 #create db object
 sql_database = SQLDatabase(
+
     engine, include_tables=["datalayers_datalayer"]
+
 )
 
 #init query engine
@@ -61,4 +64,3 @@ query_str = "What is the name of the shape with the smallest area and how big is
 console.print(f'[bold]{query_str}[/bold]')
 
 response = query_engine.query(query_str)
-console.print(f'[bold]{response}[/bold]')
