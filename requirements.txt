@@ -6,7 +6,6 @@ pandas
 matplotlib
 sqlite-utils
 ipython
-requests
 psycopg2-binary
 rich
-networkx
+requests
