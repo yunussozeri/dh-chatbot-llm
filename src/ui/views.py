@@ -16,10 +16,10 @@ def hello(request):
 
 
 def llm_engine(request):
-    #TODO : CONTAINERIZE QUERY ENGINE 
-    from .llm_query_engine import LLMQueryEngine
-    engine = LLMQueryEngine()
     
-    response = engine.test_import("HELLOOOO")
+    q = request.GET.get('q')
     
-    return JsonResponse({'response': response})
+    
+    
+    
+    return JsonResponse({'response': f'{q}'})

@@ -52,4 +52,8 @@ class LLMQueryEngine:
         
     
     
-llm = LLMQueryEngine()
+#llm = LLMQueryEngine()
+
+#response = llm.submit_query("what is the size of largest area in sqm?")
+
+#print(response.response)
