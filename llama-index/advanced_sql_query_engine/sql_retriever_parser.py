@@ -2,7 +2,11 @@ from llama_index.core.retrievers import SQLRetriever
 from typing import List
 from llama_index.core.query_pipeline import FnComponent
 
-sql_retriever = SQLRetriever(sql_database)
+from llama_index.core.objects import (
+    SQLTableSchema
+)
+
+
 
 
 def get_table_context_str(table_schema_objs: List[SQLTableSchema]):

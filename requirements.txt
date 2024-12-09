@@ -6,6 +6,7 @@ pandas
 matplotlib
 sqlite-utils
 ipython
+pyvis
 
 
 psycopg2-binary
