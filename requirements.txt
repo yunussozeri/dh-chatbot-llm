@@ -12,3 +12,4 @@ pyvis
 psycopg2-binary
 rich
 requests
+python-dotenv
