@@ -1,3 +1,4 @@
+
 from sqlalchemy import create_engine, MetaData, inspect
 
 from llama_index.core import SQLDatabase, Settings
@@ -53,7 +54,7 @@ ollama_embedding = OllamaEmbedding(
 
 #create db object
 sql_database = SQLDatabase(
-    engine, include_tables=table_names
+    engine, include_tables=["datalayers_datalayer"]
 )
 
 #init retriever
@@ -87,5 +88,6 @@ console.print(f'[bold]{response}[/bold]')
 
 console.print(f'[bold]{query_str}[/bold]')
 
-# response = query_engine.query(query_str)
-console.print(f'[bold]{response}[/bold]')
+
+response = query_engine.query(query_str)
+
