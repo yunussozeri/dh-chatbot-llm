@@ -28,19 +28,34 @@ from IPython.display import display, HTML
 
 from pyvis.network import Network
 
+from llama_index.llms.openai import OpenAI
+
+import dotenv
+
+# Load the .env file
+dotenv.load_dotenv()
+
+
+#llm_open_ai = OpenAI(model="gpt-3.5-turbo")
+
+
+
+
 
 llm_synth = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="dolphin-llama3:latest", request_timeout=30.0)
+#llm_synth = OpenAI(model="gpt-3.5-turbo")
 
 llm_sql = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="dolphin-llama3:latest", request_timeout=30.0)
 #llm_sql = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="mistral:latest", request_timeout=60.0)
+#llm_sql = OpenAI(model="gpt-4o-mini")
 
 
-llm_summary = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="dolphin-llama3:latest", request_timeout=30.0)
+#llm_summary = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="dolphin-llama3:latest", request_timeout=30.0)
 
 #init embedding
 ollama_embedding = OllamaEmbedding(
-    #model_name="mxbai-embed-large",
-    model_name="nomic-embed-text",
+    model_name="mxbai-embed-large",
+    #model_name="nomic-embed-text",
     base_url="http://benedikt-home-server.duckdns.org:11434",
     #ollama_additional_kwargs={"mirostat": 0},
 )
@@ -53,18 +68,18 @@ engine = create_engine(database_url)
 inspector = inspect(engine)
 
 # Get the table names
-table_names = inspector.get_table_names()
-print(table_names)
+#table_names = inspector.get_table_names()
+#print(table_names)
 
-table_names.remove('app_user_groups')
-table_names.remove('django_content_type')
-table_names.remove('django_migrations')
-table_names.remove('django_session')
-table_names.remove('auth_group')
-table_names.remove('auth_group_permissions')
+# table_names.remove('app_user_groups')
+# table_names.remove('django_content_type')
+# table_names.remove('django_migrations')
+# table_names.remove('django_session')
+# table_names.remove('auth_group')
+# table_names.remove('auth_group_permissions')
 
-print('after cleanup:')
-print(table_names)
+# print('after cleanup:')
+# print(table_names)
 
 #create databse
 sql_database = SQLDatabase(engine)
@@ -73,105 +88,65 @@ sql_database = SQLDatabase(engine)
 sql_retriever = SQLRetriever(sql_database)
 
 table_infos = {
-    'datalayers_datalayer':'',
-    'secondary_unit_lookup':'',
-    'state_lookup':'',
-    'street_type_lookup':'',
-    'spatial_ref_sys':'',
-    'geocode_settings':'',
-    'geocode_settings_default':'',
-    'direction_lookup':'',
-    'place_lookup':'',
-    'county_lookup':'',
-    'countysub_lookup':'',
-    'zip_lookup_all':'',
-    'zip_lookup_base':'',
-    'zip_lookup':'',
-    'county':'',
-    'state':'',
-    'place':'',
-    'zip_state':'',
-    'zip_state_loc':'',
-    'cousub':'',
-    'edges':'',
-    'addrfeat':'',
-    'featnames':'',
-    'addr':'',
-    'zcta5':'',
-    'tabblock20':'',
-    'faces':'',
-    'loader_platform':'',
-    'loader_variables':'',
-    'loader_lookuptables':'',
-    'tract':'',
-    'tabblock':'',
-    'bg':'',
-    'pagc_gaz':'',
-    'pagc_lex':'',
-    'pagc_rules':'',
-    'topology':'',
-    'layer':'',
-    'auth_permission':'',
-    'chirps_prcp':'This table provides precipitation data for Ghana',
+    'datalayers_datalayer':'A description of all the tables in the database',
+    'chirps_prcp':'	Precipitation (satellite) | #weather #rainfall #satellite',
     'chirps_tprecit':'',
     'chirts_maxt':'',
-    'chirts_tmax':'',
-    'copernicus_built':'',
-    'copernicus_crop':'',
-    'copernicus_forest':'',
-    'copernicus_herbveg':'',
-    'copernicus_herbwet':'',
-    'copernicus_moss':'',
+    'chirts_tmax':'Maximum temperature (satellite) | #temperature #weather #satellite #maximum',
+    'copernicus_built':'Urban land cover | #landcover #built-up #urbanization',
+    'copernicus_crop':'Cropland land cover | #landcover #proportion #cropland',
+    'copernicus_forest':'Forest land cover | #landcover #forest',
+    'copernicus_herbveg':'Herbaceous wetland land cover | #landcover #wetland',
+    'copernicus_herbwet':'Permanent herbaceous wetland land cover | #landcover #wetland',
+    'copernicus_moss':'Moss and litchen land cover | #landcover #litchen #moss',
     'copernicus_schrub':'',
-    'copernicus_shrub':'',
-    'copernicus_sparse':'',
-    'copernicus_water':'',
+    'copernicus_shrub':'Shrubland land cover | #landcover #shrubland',
+    'copernicus_sparse':'Bare and sparse land cover | #landcover #bare #sparse',
+    'copernicus_water':'Permanent water bodies land cover | #landcover #water bodies',
     'custom_covreflab':'',
     'data_custom_covreflab':'',
     'data_healthsitesio_facilities':'',
     'data_osm_river':'',
     'app_user':'',
-    'app_user_user_permissions':'',
-    'datalayers_datalayerlogentry':'',
     'datalayers_datalayersource':'',
     'datalayers_datalayer_related_to':'',
-    'dhs_drinkwater':'',
-    'era5_t2m':'',
-    'healthsitesio_facilities':'',
+    'dhs_drinkwater':'Access to clean drinking water | #infrastructure #water and sanitation #drinking water	dhs_drinkwater',
+    'era5_t2m':'ERA5 Temperature 2m (test)',
+    'healthsitesio_facilities':'	Health facilities',
     'koeppen_a':'',
-    'koeppen_af':'',
-    'koeppen_am':'',
-    'koeppen_aw':'',
+    'koeppen_af':'Tropical, rainforest climate coverage',
+    'koeppen_am':'	Tropical, monsoon climate coverage',
+    'koeppen_aw':'Tropical, savannah climate coverage',
     'koeppen_b':'',
-    'koeppen_bs':'',
-    'koeppen_bw':'',
+    'koeppen_bs':'	Arid, steppe climate coverage',
+    'koeppen_bw':'	Arid, desert climate coverage',
     'koeppen_c':'',
-    'koeppen_cf':'',
+    'koeppen_cf':'	Temperate, no dry season climate coverage',
     'datalayers_category':'',
     'django_admin_log':'',
-    'koeppen_cs':'',
-    'koeppen_cw':'',
+    'koeppen_cs':'	Temperate, dry summer climate coverage',
+    'koeppen_cw':'	Temperate, dry winter climate coverage',
     'koeppen_d':'',
-    'koeppen_df':'',
-    'koeppen_ds':'',
-    'koeppen_dw':'',
+    'koeppen_df':'	Cold, no dry season climate coverage',
+    'koeppen_ds':'	Cold, dry summer climate coverage',
+    'koeppen_dw':'	Cold, dry winter climate coverage',
     'koeppen_e':'',
-    'koeppen_ef':'',
-    'koeppen_et':'',
-    'malariaatlas_traveltimehc':'',
+    'koeppen_ef':'	Polar, frost climate coverage',
+    'koeppen_et':'	Polar, tundra climate coverage',
+    'malariaatlas_traveltimehc':'	Travel time to nearest health facility (motorized)',
     'meteo_maxt':'',
     'meteo_mint':'',
-    'meteo_prcp':'This table provides precipitation data for Ghana',
-    'meteo_tavg':'',
-    'meteo_tmax':'',
-    'meteo_tmin':'',
+    'meteo_prcp':'Precipitation (station) | #weather #station #rainfall',
+    'meteo_tavg':'Average temperature (station) | #temperature #weather #average #mean #station',
+    'meteo_tmax':'Maximum temperature (station) | #temperature #station #maximum',
+    'meteo_tmin':'Minimum temperature (station) | #temperature #weather #minimum',
     'meteo_tprecit':'',
     'meteostat_daily':'',
     'meteostat_hourly':'',
     'meteostat_stations':'',
-    'shapes_shape':'',
-    'worldpop_popc':'',
-    'worldpop_popd':'',
+    'shapes_shape':'Here you can find the regions in the data. A Shape is an geographic location/area. They are all found in this table. Geographic Data for Ghana is found here. Can be used with a join statement to resolve the shape_i d. Countries, regions and Districts are found here.',
+    'worldpop_popc':'Population count',
+    'worldpop_popd':'Population density',
     'shapes_type':'',
     'taggit_taggeditem':'',
     'taggit_tag':''
@@ -201,7 +176,7 @@ table_node_mapping = SQLTableNodeMapping(sql_database)
 
 table_schema_objs = [
     SQLTableSchema(table_name=table_name, context_str=table_infos.get(table_name))
-    for table_name in table_names
+    for table_name in table_infos.keys()
 ]  # add a SQLTableSchema for each table
 
 obj_index = ObjectIndex.from_objects(
@@ -315,5 +290,6 @@ response = qp.run(
     #query="I need a quick overview of the Ada East district, Ghana. How large is this district, how many people live there, and what is the most recent urbanization rate?"
     #query="I need the location of all schools in Kumasi district, Ghana. Is this dataset available?"
     query="For my research project on malaria, I need precipitation data for the period from January 2020 to December 2023. Are these data available, and in what resolution?"
+    #query="What regions are found in the data?"
 )
 print(str(response))
