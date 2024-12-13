@@ -11,3 +11,5 @@ psycopg2-binary
 rich
 networkx
 flask-cors
+python-dotenv
+pyvis
