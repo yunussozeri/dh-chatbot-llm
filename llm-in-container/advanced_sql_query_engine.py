@@ -30,23 +30,21 @@ from pyvis.network import Network
 
 from llama_index.llms.openai import OpenAI
 
+from llama_index.core.prompts.base import PromptTemplate
+from llama_index.core.prompts.prompt_type import PromptType
+
 import dotenv
 
-def submit_query(query_str):
+def submit_query(query_str, without_docker=False):
     # Load the .env file
     dotenv.load_dotenv()
 
 
-    #llm_open_ai = OpenAI(model="gpt-3.5-turbo")
-
-
-
-
-
-    llm_synth = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="dolphin-llama3:latest", request_timeout=30.0)
+    
+    llm_synth = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="dolphin-mistral:latest", request_timeout=30.0)
     #llm_synth = OpenAI(model="gpt-3.5-turbo")
 
-    llm_sql = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="dolphin-llama3:latest", request_timeout=30.0)
+    llm_sql = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="dolphin-mistral:latest", request_timeout=30.0)
     #llm_sql = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="mistral:latest", request_timeout=60.0)
     #llm_sql = OpenAI(model="gpt-4o-mini")
 
@@ -62,7 +60,7 @@ def submit_query(query_str):
     )
 
     #create database engine
-    database_url = 'postgresql://didex:didex@postgis:5432/didex'
+    database_url = f'postgresql://didex:didex@{"localhost" if without_docker else "postgis"}:5432/didex'
     engine = create_engine(database_url)
 
     # Get the inspector
@@ -90,7 +88,7 @@ def submit_query(query_str):
 
     table_infos = {
         'datalayers_datalayer':'A description of all the tables in the database',
-        'chirps_prcp':'	Precipitation (satellite) | #weather #rainfall #satellite',
+        'chirps_prcp':'Here you can find percipition Data from Ghana.	Precipitation (satellite) | #weather #rainfall #satellite',
         'chirps_tprecit':'',
         'chirts_maxt':'',
         'chirts_tmax':'Maximum temperature (satellite) | #temperature #weather #satellite #maximum',
@@ -137,7 +135,7 @@ def submit_query(query_str):
         'malariaatlas_traveltimehc':'	Travel time to nearest health facility (motorized)',
         'meteo_maxt':'',
         'meteo_mint':'',
-        'meteo_prcp':'Precipitation (station) | #weather #station #rainfall',
+        'meteo_prcp':'Here you can find percipition Data from Ghana. Precipitation (station) | #weather #station #rainfall',
         'meteo_tavg':'Average temperature (station) | #temperature #weather #average #mean #station',
         'meteo_tmax':'Maximum temperature (station) | #temperature #station #maximum',
         'meteo_tmin':'Minimum temperature (station) | #temperature #weather #minimum',
@@ -145,8 +143,8 @@ def submit_query(query_str):
         'meteostat_daily':'',
         'meteostat_hourly':'',
         'meteostat_stations':'',
-        'shapes_shape':'Here you can find the regions in the data. A Shape is an geographic location/area. They are all found in this table. Geographic Data for Ghana is found here. Can be used with a join statement to resolve the shape_i d. Countries, regions and Districts are found here.',
-        'worldpop_popc':'Population count',
+        'shapes_shape':'Here you can find the regions in the data. Here you can find the districts in the data. Here you can find the countries in the data. Here you can find the area of a region/district in sqm.  A Shape is an geographic location/area. They are all found in this table. Geographic Data for Ghana is found here. Can be used with a join statement to resolve the shape_i d. Countries, regions and Districts are found here.',
+        'worldpop_popc':'Here you can find the population of the regions/districts. Join this with shapes_shape on shape_id. Population count',
         'worldpop_popd':'Population density',
         'shapes_type':'',
         'taggit_taggeditem':'',
@@ -206,20 +204,56 @@ def submit_query(query_str):
         sql_result_start = response.find("SQLResult:")
         if sql_result_start != -1:
             response = response[:sql_result_start]
-        return response.strip().strip("```").strip()
+        return response.strip().strip("```").replace("`", "").strip()
 
 
     sql_parser_component = FnComponent(fn=parse_response_to_sql)
 
-    text2sql_prompt = DEFAULT_TEXT_TO_SQL_PROMPT.partial_format(
-        dialect=engine.dialect.name
+    MODIFIED_TEXT_TO_SQL_TMPL = (
+        "Given an input question, first create a syntactically correct {dialect} "
+        "query to run, then look at the results of the query and return the answer. "
+        "You can order the results by a relevant column to return the most "
+        "interesting examples in the database.\n\n"
+        "Never query for all the columns from a specific table, only ask for a "
+        "few relevant columns given the question.\n\n"
+        "Pay attention to use only the column names that you can see in the schema "
+        "description. "
+        "Be careful to not query for columns that do not exist. "
+        "Pay attention to which column is in which table. "
+        "Also, qualify column names with the table name when needed. "
+
+        "Provide an valid Postgres SQL statement."
+        #"Do NOT use aliases (like AS)."
+
+        "You are required to use the following format, each taking one line:\n\n"
+        "Question: Question here\n"
+        "SQLQuery: SQL Query to run\n"
+        "SQLResult: Result of the SQLQuery\n"
+        "Answer: Final answer here\n\n"
+        "Only use tables listed below.\n"
+        "{schema}\n\n"
+        "Question: {query_str}\n"
+        "SQLQuery: "
     )
+
+    MODIFIED_TEXT_TO_SQL_PROMPT = PromptTemplate(
+        MODIFIED_TEXT_TO_SQL_TMPL,
+        prompt_type=PromptType.TEXT_TO_SQL,
+    )
+
+    text2sql_prompt = MODIFIED_TEXT_TO_SQL_PROMPT.partial_format(dialect=engine.dialect.name)
+    #text2sql_prompt = DEFAULT_TEXT_TO_SQL_PROMPT.partial_format(dialect=engine.dialect.name)
+
+    print(engine.dialect.name)
+
+
     print(text2sql_prompt.template)
 
 
 
     response_synthesis_prompt_str = (
         "Given an input question, synthesize a response from the query results.\n"
+        "Also always mention the queried tables aka the used datasources. \n"
         "Query: {query_str}\n"
         "SQL: {sql_query}\n"
         "SQL Response: {context_str}\n"
@@ -271,7 +305,7 @@ def submit_query(query_str):
 
 
 
-    net = Network(notebook=True, cdn_resources="in_line", directed=True)
+    net = Network(notebook=False, cdn_resources="in_line", directed=True)
     net.from_nx(qp.dag)
 
 
@@ -288,11 +322,11 @@ def submit_query(query_str):
 
 
     response = qp.run(
-        #query="I need a quick overview of the Ada East district, Ghana. How large is this district, how many people live there, and what is the most recent urbanization rate?"
+        query=query_str
+        #query="I need a quick overview of the Ada East district, Ghana. How large is this district and how many people live there?"
         #query="I need the location of all schools in Kumasi district, Ghana. Is this dataset available?"
         #query="For my research project on malaria, I need precipitation data for the period from January 2020 to December 2023. Are these data available, and in what resolution?"
         #query="What regions are found in the data?"
-        query=query_str
     )
     print(str(response))
 
