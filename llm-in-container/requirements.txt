@@ -1,0 +1,15 @@
+flask
+sqlalchemy
+requests
+llama-index-llms-ollama
+llama-index-embeddings-ollama
+llama-index
+sqlite-utils
+ipython
+requests
+psycopg2-binary
+rich
+networkx
+flask-cors
+python-dotenv
+pyvis

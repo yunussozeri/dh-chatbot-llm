@@ -1,0 +1,61 @@
+services:
+  datahub:
+    image: ghcr.io/datasnack/datahub:latest
+    env_file:
+      - .env
+    ports:
+      - ${DATAHUB_PORT:-8000}:8000
+    volumes:
+      - ./data:/app/data/
+      - ./src:/app/src/
+
+  postgis:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdat
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports: 
+      - '5432:5432'
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "admin@admin.com"
+      PGADMIN_DEFAULT_PASSWORD: "admin"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+  ollama:
+    image: ollama/ollama
+    ports:
+      - 11434:11434/tcp
+    volumes:
+      - ollama:/root/.ollama
+    restart: unless-stopped
+    # runtime: nvidia
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all # alternatively, use `all` for all GPUs
+    #           capabilities: [gpu]
+
+  llm-query-engine:
+    image: llm-query-engine:latest
+    restart: always
+    ports:
+      - "8001:8001"
+    depends_on:
+      - postgis
+      - ollama
+
+volumes:
+  ollama:
+  pgadmin-data:
