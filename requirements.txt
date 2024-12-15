@@ -6,6 +6,9 @@ pandas
 matplotlib
 sqlite-utils
 ipython
+
+pyvis
 psycopg2-binary
 rich
 requests
+python-dotenv

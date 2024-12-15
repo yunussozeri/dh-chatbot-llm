@@ -1,10 +1,12 @@
 from flask import Flask, request, jsonify, Response
-from llm_query_engine.query_engine import LLMQueryEngine
+from advanced_sql_query_engine import submit_query
 from flask_cors import CORS
+
 # Initialize the Flask application and the LLMQueryEngine instance
 app = Flask(__name__)
+
 CORS(app,resources={r"/query": {"origins": "http://localhost:8000"}}, methods=["POST", "GET"])
-llm = LLMQueryEngine()
+
 @app.route('/query', methods=['GET'])
 def query_get():
     # Access the query parameter from the URL
@@ -30,10 +32,10 @@ def query_post():
     if not query_string:
         return jsonify({"error": "Missing 'query' parameter"}), 400
     
-    response = llm.submit_query(query_string)
+    response = submit_query(query_string)
     return jsonify({
         "query": query_string,
-        "response": response.response,
+        "response": response,
     })
 
 if __name__ == '__main__':

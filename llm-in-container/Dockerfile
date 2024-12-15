@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 8001
 
 # Run the Flask app when the container starts
-CMD ["python", "-m", "llm_query_engine.llm_query_engine_api"]
+CMD ["python", "-m", "llm_query_engine_api"]
