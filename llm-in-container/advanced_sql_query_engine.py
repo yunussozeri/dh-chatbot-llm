@@ -33,15 +33,24 @@ from llama_index.llms.openai import OpenAI
 from llama_index.core.prompts.base import PromptTemplate
 from llama_index.core.prompts.prompt_type import PromptType
 
+import llama_index.core
+
+ # setup Arize Phoenix for logging/observability
+import phoenix as px
+
 import dotenv
 
 def submit_query(query_str, without_docker=False):
     # Load the .env file
     dotenv.load_dotenv()
 
+   
+
+    px.launch_app()
+    llama_index.core.set_global_handler("arize_phoenix")
 
     
-    llm_synth = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="dolphin-mistral:latest", request_timeout=30.0)
+    llm_synth = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="dolphin-llama3:latest", request_timeout=30.0)
     #llm_synth = OpenAI(model="gpt-3.5-turbo")
 
     llm_sql = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="dolphin-mistral:latest", request_timeout=30.0)
