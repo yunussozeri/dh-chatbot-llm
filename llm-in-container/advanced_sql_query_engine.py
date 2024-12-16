@@ -53,7 +53,7 @@ def submit_query(query_str, without_docker=False):
     llm_synth = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="dolphin-llama3:latest", request_timeout=30.0)
     #llm_synth = OpenAI(model="gpt-3.5-turbo")
 
-    llm_sql = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="dolphin-mistral:latest", request_timeout=30.0)
+    llm_sql = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="gemma2:9b", request_timeout=30.0)
     #llm_sql = Ollama(base_url='http://benedikt-home-server.duckdns.org:11434', model="mistral:latest", request_timeout=60.0)
     #llm_sql = OpenAI(model="gpt-4o-mini")
 
