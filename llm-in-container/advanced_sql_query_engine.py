@@ -198,8 +198,6 @@ def submit_query(query_str, without_docker=False):
 
     table_context_string = get_table_context_str(table_schema_objs)
 
-    print(table_context_string)
-
 
     def parse_response_to_sql(response: ChatResponse) -> str:
         
@@ -270,13 +268,6 @@ def submit_query(query_str, without_docker=False):
 
     text2sql_prompt = MODIFIED_TEXT_TO_SQL_PROMPT.partial_format(dialect=engine.dialect.name)
     #text2sql_prompt = DEFAULT_TEXT_TO_SQL_PROMPT.partial_format(dialect=engine.dialect.name)
-
-    print(engine.dialect.name)
-
-
-    print(text2sql_prompt.template)
-
-
 
     response_synthesis_prompt_str = (
         "Given an input question, synthesize a response from the query results.\n"
