@@ -202,18 +202,36 @@ def submit_query(query_str, without_docker=False):
 
 
     def parse_response_to_sql(response: ChatResponse) -> str:
-        """Parse response to SQL."""
-        response = response.message.content
-        sql_query_start = response.find("SQLQuery:")
-        if sql_query_start != -1:
-            response = response[sql_query_start:]
-            # TODO: move to removeprefix after Python 3.9+
-            if response.startswith("SQLQuery:"):
-                response = response[len("SQLQuery:") :]
-        sql_result_start = response.find("SQLResult:")
-        if sql_result_start != -1:
-            response = response[:sql_result_start]
-        return response.strip().strip("```").replace("`", "").strip()
+        
+
+        sql_query = ''
+
+        #extract message content
+        message_content = response.message.content
+
+        print('####')
+        print(response)
+        print('####')
+
+        #find sql query location
+        sql_query_start = message_content.find("SQLQuery:")
+        sql_query_end = message_content.find("SQLResult:")
+
+        #extract sql query
+        if sql_query_start != -1 and sql_result_start != -1:
+            sql_query = message_content[sql_query_start + len("SQLQuery:"):sql_query_end]
+        else: 
+            #error: no sql query found
+            return "WITH non_existent_table AS (SELECT 'no sql query provided' as error) SELECT * FROM non_existent_table;"
+
+
+        #format & error correct sql query
+        sql_query = sql_query.strip()
+        sql_query = sql_query.strip("```")
+        sql_query = sql_query.replace("`", "")
+        sql_query = sql_query.strip()
+
+        return sql_query
 
 
     sql_parser_component = FnComponent(fn=parse_response_to_sql)
