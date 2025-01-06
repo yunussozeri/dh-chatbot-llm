@@ -346,6 +346,5 @@ def submit_query(query_str, without_docker=False):
         #query="For my research project on malaria, I need precipitation data for the period from January 2020 to December 2023. Are these data available, and in what resolution?"
         #query="What regions are found in the data?"
     )
-    print(str(response))
 
-    return str(response)
+    return str(response.message.content)
